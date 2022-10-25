@@ -1,6 +1,6 @@
 ## PyZX
 
-* Read zx file (-i: .zx / -o: .pdf)
+### Read zx file (-i: .zx / -o: .pdf)
 
 > python3 read_zx_file.py 
 > -i ./circuits/zx/swap.zx 
