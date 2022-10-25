@@ -1,5 +1,13 @@
 ## PyZX
 
+* Read zx file (-i: .zx / -o: .pdf)
+
+> python3 read_zx_file.py 
+> -i ./circuits/zx/swap.zx 
+> -o ./circuits/zx/swap.pdf
+
+
+
 [![Unitary Fund](https://img.shields.io/badge/Supported%20By-UNITARY%20FUND-brightgreen.svg?style=for-the-badge)](http://unitary.fund)
 [![CQC Support](https://github.com/Quantomatic/pyzx/raw/master/images/cqc-banner-small.png)](https://cambridgequantum.com/)
 [![PyPI version](https://badge.fury.io/py/pyzx.svg)](https://badge.fury.io/py/pyzx)
