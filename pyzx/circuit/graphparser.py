@@ -130,6 +130,7 @@ def circuit_to_graph(c: Circuit, compress_rows:bool=True, backend:Optional[str]=
             v = g.add_vertex(VertexType.Z, q, r)
             g.add_edge(g.edge(u,v),EdgeType.SIMPLE)
         else:
+            print(gate.name)
             if not compress_rows: #or not isinstance(gate, (ZPhase, XPhase, HAD)):
                 r = max(q_mapper.max_row(), c_mapper.max_row())
                 q_mapper.set_all_rows(r)
