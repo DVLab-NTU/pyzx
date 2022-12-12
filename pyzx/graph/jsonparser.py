@@ -277,3 +277,44 @@ def to_graphml(g: BaseGraph[VT,ET]) -> str:
 """
 
     return gml
+
+def graph_to_bzx(g: BaseGraph[VT,ET]) -> str:
+    bzx = ""
+    edge_dict={1:"S", 2:"H"}
+    vertex_dict={0:"B", 1:"Z", 2:"X"}
+    for i in g.inputs():
+        s = ""
+        s += "I"+str(i)+" "+str(g.qubit(i))+" "
+        for n in g.neighbors(i):
+            if((i, n) in g.edges()):
+                s += edge_dict[g.edge_type((i,n))]+str(n)+" "
+            else:
+                s += edge_dict[g.edge_type((n,i))]+str(n)+" "
+        bzx += s+"\n"
+
+    for v in g.vertices():
+        if v not in g.inputs() and v not in g.outputs():
+            s = ""
+            s += vertex_dict[g.type(v)]+str(v)+" "+str(g.qubit(v))+" "
+            for n in g.neighbors(v):
+                if((v, n) in g.edges()):
+                    s += edge_dict[g.edge_type((v,n))]+str(n)+" "
+                else:
+                    s += edge_dict[g.edge_type((n,v))]+str(n)+" "
+            if g.phase(v) != 0:
+                frac = str(g.phase(v)).split('/')
+                if frac[1] != 0:
+                    s += frac[0]+"*pi/"+frac[1]
+                else:
+                    s += frac[0]+"*pi"
+            bzx += s+"\n"
+
+    for o in g.outputs():
+        s = ""
+        s += "O"+str(o)+" "+str(g.qubit(o))+" "
+        for n in g.neighbors(o):
+            if((o, n) in g.edges()):
+                s += edge_dict[g.edge_type((o,n))]+str(n)+" "
+            else:
+                s += edge_dict[g.edge_type((n,o))]+str(n)+" "
+        bzx += s+"\n"

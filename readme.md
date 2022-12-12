@@ -6,7 +6,11 @@
 > -i ./circuits/zx/swap.zx 
 > -o ./circuits/zx/swap.pdf
 
+### Write bzx file (-i: .qasm / -o: .bzx)
 
+> python3 write_zx_file.py 
+> -i ./circuits/qft/qft_5.qasm 
+> -o ./circuits/qft/qft_5.bzx
 
 [![Unitary Fund](https://img.shields.io/badge/Supported%20By-UNITARY%20FUND-brightgreen.svg?style=for-the-badge)](http://unitary.fund)
 [![CQC Support](https://github.com/Quantomatic/pyzx/raw/master/images/cqc-banner-small.png)](https://cambridgequantum.com/)

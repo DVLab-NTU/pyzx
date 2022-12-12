@@ -55,10 +55,15 @@ def read_zx_file(f: str):
         if len(items) > 2:
             last_item = items[len(items)-1]
             if last_item[0] != 'S' and last_item[0] != 'H':
-                if last_item.find('*pi/') != -1:
+                if last_item.find('pi') != -1:
+                    if last_item[:2] == 'pi':
+                        last_item = '1*' + last_item
+                    if last_item[-2:] == 'pi':
+                        last_item += '/1'
                     num, denum = int(last_item.split('*pi/')[0]), int(last_item.split('*pi/')[1])
                     phase = Fraction(num, denum)
                     items = items[:-1]
+                
                 else:
                     phase = Fraction(float(last_item)/np.pi).limit_denominator(1000)
                     items = items[:-1]

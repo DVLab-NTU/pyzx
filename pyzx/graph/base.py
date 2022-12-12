@@ -467,6 +467,11 @@ class BaseGraph(Generic[VT, ET], metaclass=DocstringMeta):
         from ..tikz import to_tikz
         return to_tikz(self,draw_scalar)
 
+    def to_bzx(self) -> str:
+        from .jsonparser import graph_to_bzx
+        return graph_to_bzx(self)
+
+
     @classmethod
     def from_json(cls, js) -> 'BaseGraph':
         """Converts the given .qgraph json string into a Graph. 
