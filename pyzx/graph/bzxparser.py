@@ -51,7 +51,7 @@ def read_zx_file(f: str):
         id = int(items[0][1:])
         type = items[0][0]
         qubit = int(items[1])
-        column = int(items[2][1:])
+        column = int(items[2])
         phase = 0
         neighbors = []
         if len(items) > 3:
@@ -138,7 +138,7 @@ def graph_to_bzx(g: BaseGraph[VT,ET]) -> str:
     vertex_dict={0:"B", 1:"Z", 2:"X", 3:"H"}
     for i in g.inputs():
         s = ""
-        s += "I"+str(i)+" "+str(g.qubit(i))+" C"+str(g.row(i))+" "
+        s += "I"+str(i)+" "+str(g.qubit(i))+" "+str(g.row(i))+" "
         for n in g.neighbors(i):
             if((i, n) in g.edges()):
                 s += edge_dict[g.edge_type((i,n))]+str(n)+" "
@@ -148,7 +148,7 @@ def graph_to_bzx(g: BaseGraph[VT,ET]) -> str:
 
     for o in g.outputs():
         s = ""
-        s += "O"+str(o)+" "+str(g.qubit(o))+" C"+str(g.row(o))+" "
+        s += "O"+str(o)+" "+str(g.qubit(o))+" "+str(g.row(o))+" "
         for n in g.neighbors(o):
             if((o, n) in g.edges()):
                 s += edge_dict[g.edge_type((o,n))]+str(n)+" "
@@ -159,7 +159,7 @@ def graph_to_bzx(g: BaseGraph[VT,ET]) -> str:
     for v in g.vertices():
         if v not in g.inputs() and v not in g.outputs():
             s = ""
-            s += vertex_dict[g.type(v)]+str(v)+" "+str(g.qubit(v))+" C"+str(g.row(v))+" "
+            s += vertex_dict[g.type(v)]+str(v)+" "+str(g.qubit(v))+" "+str(g.row(v))+" "
             for n in g.neighbors(v):
                 if((v, n) in g.edges()):
                     s += edge_dict[g.edge_type((v,n))]+str(n)+" "
