@@ -20,7 +20,7 @@ from fractions import Fraction
 from typing import List, Dict, Tuple, Optional
 
 from . import Circuit
-from .gates import Gate, qasm_gate_table, ZPhase, XPhase, CRZ
+from .gates import Gate, qasm_gate_table, ZPhase, XPhase, CRZ, CP
 
 class QASMParser(object):
     """Class for parsing QASM source files into circuit descriptions."""
@@ -155,7 +155,7 @@ class QASMParser(object):
                 else: g = qasm_gate_table[name](argset[0]) # type: ignore # - Gate subclasses with different numbers of parameters
                 gates.append(g)
                 continue
-            if name.startswith("rx") or name.startswith("rz") or name.startswith("u1") or name.startswith('crz'):
+            if name.startswith("rx") or name.startswith("rz") or name.startswith("u1") or name.startswith('crz') or name.startswith('cp'):
                 i = name.find('(')
                 j = name.find(')')
                 if i == -1 or j == -1: raise TypeError("Invalid specification {}".format(name))
@@ -172,6 +172,7 @@ class QASMParser(object):
                 phase = self.parse_phase_arg(valp)
                 if name.startswith('rx'): g = XPhase(argset[0],phase=phase)
                 elif name.startswith('crz'): g = CRZ(argset[0],argset[1],phase=phase)
+                elif name.startswith('cp'): g = CP(argset[0],argset[1],phase=phase)
                 else: g = ZPhase(argset[0],phase=phase)
                 gates.append(g)
                 continue

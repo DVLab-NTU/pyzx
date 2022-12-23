@@ -580,6 +580,35 @@ class CRZ(Gate):
         for gate in self.to_basic_gates():
             gate.to_graph(g, q_mapper, c_mapper)
 
+class CP(Gate):
+    name = 'CP'
+    qasm_name = 'cp'
+    quippername = 'undefined'
+    printphase: ClassVar[bool] = True
+    def __init__(self, control: int, target: int, phase: FractionLike) -> None:
+        self.target = target
+        self.control = control
+        self.phase = phase
+
+    def to_basic_gates(self):
+        phase1 = self.phase / 2
+        phase2 = -self.phase / 2
+        try:
+            phase1 = Fraction(phase1) % 2
+            phase2 = Fraction(phase2) % 2
+        except Exception:
+            pass
+        return [ZPhase(self.control, phase1),
+                ZPhase(self.target, phase1),
+                CNOT(self.control, self.target),
+                ZPhase(self.target, phase2),
+                CNOT(self.control, self.target)]
+
+
+    def to_graph(self, g, q_mapper, c_mapper):
+        for gate in self.to_basic_gates():
+            gate.to_graph(g, q_mapper, c_mapper)
+
 class CHAD(Gate):
     name = 'CHAD'
     qasm_name = 'ch'
