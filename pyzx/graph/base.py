@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 import abc
 import math
 import copy
@@ -467,14 +468,15 @@ class BaseGraph(Generic[VT, ET], metaclass=DocstringMeta):
         from ..tikz import to_tikz
         return to_tikz(self,draw_scalar)
 
-    def to_bzx(self) -> str:
-        from .bzxparser import graph_to_bzx
-        return graph_to_bzx(self)
+    def to_zx(self) -> str:
+        from .bzxparser import graph_to_zx
+        return graph_to_zx(self)
+
 
     @classmethod
-    def from_bzx(cls, bzx) -> 'BaseGraph':
-        from .bzxparser import bzx_to_graph
-        return bzx_to_graph(bzx, cls.backend)
+    def from_zx(cls, zx) -> 'BaseGraph':
+        from .bzxparser import zx_to_graph
+        return zx_to_graph(zx, cls.backend)
 
 
     @classmethod
@@ -1018,3 +1020,14 @@ class BaseGraph(Generic[VT, ET], metaclass=DocstringMeta):
     def set_vdata(self, vertex: VT, key: str, val: Any) -> None:
         """Sets the vertex data associated to key to val."""
         raise NotImplementedError("Not implemented on backend" + type(self).backend)
+
+
+def determine_file_type(zxfile: str) -> str:
+    """Tries to figure out in which format the file is given (quipper, qasm or qc)"""
+    fname = zxfile
+    ext = os.path.splitext(fname)[-1]
+    if ext == '.zx':
+        return "zx"
+
+    raise TypeError("Couldn't determine zx format.")
+
