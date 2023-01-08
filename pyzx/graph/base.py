@@ -468,15 +468,15 @@ class BaseGraph(Generic[VT, ET], metaclass=DocstringMeta):
         from ..tikz import to_tikz
         return to_tikz(self,draw_scalar)
 
-    def to_bzx(self) -> str:
-        from .bzxparser import graph_to_bzx
-        return graph_to_bzx(self)
+    def to_zx(self) -> str:
+        from .bzxparser import graph_to_zx
+        return graph_to_zx(self)
 
 
     @classmethod
-    def from_bzx(cls, zx) -> 'BaseGraph':
-        from .bzxparser import bzx_to_graph
-        return bzx_to_graph(zx, cls.backend)
+    def from_zx(cls, zx) -> 'BaseGraph':
+        from .bzxparser import zx_to_graph
+        return zx_to_graph(zx, cls.backend)
 
 
     @classmethod

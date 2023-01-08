@@ -31,7 +31,6 @@ class ZXParser(object):
         def __repr__(self) -> str:
             return str(self)
             
-
     def parse(self, s: str, strict: bool=True) -> List[V]:
         lines = s.splitlines()
         r = []
@@ -133,82 +132,9 @@ class ZXParser(object):
         else: return "QC_error"
 
 
-def zx(s: str) -> BaseGraph:
+def zx_to_graph(zx: str, backend:Optional[str]=None) -> BaseGraph:
     p = ZXParser()
-    return p.parse(s, strict=False)
-
-def read_zx_file(f: str):
-    my_file = open(f)
-    data = my_file.read()
-    line_list = [ line.split(' //')[0] for line in data.split('\n') if line[0:2] != '//' and line != '']
-    i_line, o_line, v_line = [],[],[]
-    for line in line_list:
-        if line[0] == 'I':
-            i_line.append(line)
-        if line[0] == 'O':
-            o_line.append(line)
-        if line[0] == 'Z' or line[0] == 'X' or line[0] == 'H':
-            v_line.append(line)
-    
-    class IO:
-        def __init__(self, id, qubit, column, neighbors):
-            self.id = id
-            self.qubit = qubit
-            self.column = column
-            self.neighbors = neighbors
-    class V:
-        def __init__(self, id, type, phase, qubit, column, neighbors):
-            self.id = id
-            self.type = type
-            self.phase = phase
-            self.qubit = qubit
-            self.column = column
-            self.neighbors = neighbors
-            self.marked = False
-        
-    inputs, outputs, vertices = [],[],[]
-    # for i in i_line:
-    #     items = i.split(' ')
-    #     input = IO(int(items[0][1:]),int(items[1]),int(items[2][1:]),[(items[3][0], int(items[3][1:]))])
-    #     inputs.append(input)
-    # for o in o_line:
-    #     items = o.split(' ')
-    #     output = IO(int(items[0][1:]),int(items[1]),int(items[2][1:]), [(items[3][0], int(items[3][1:]))])
-    #     outputs.append(output)
-    for v in i_line + o_line + v_line:
-        items = v.split(' ')
-        id = int(items[0][1:])
-        type = items[0][0]
-        qubit = int(items[1])
-        column = int(items[2])
-        phase = 0
-        neighbors = []
-        if len(items) > 3:
-            last_item = items[len(items)-1]
-            if last_item[0] != 'S' and last_item[0] != 'H':
-                if last_item.find('pi') != -1:
-                    if last_item[:2] == 'pi':
-                        last_item = '1*' + last_item
-                    if last_item[-2:] == 'pi':
-                        last_item += '/1'
-                    num, denum = int(last_item.split('*pi/')[0]), int(last_item.split('*pi/')[1])
-                    phase = Fraction(num, denum)
-                    items = items[:-1]
-                
-                else:
-                    phase = Fraction(float(last_item)/np.pi).limit_denominator(1000)
-                    items = items[:-1]
-        for item in items[3:]:
-            et, nId = item[0], int(item[1:])
-            neighbors.append((et, nId))
-        
-        vertex = V(id, type, phase, qubit, column, neighbors)
-        vertices.append(vertex)
-    return inputs, outputs, vertices
-
-def bzx_to_graph(bzx: str, backend:Optional[str]=None) -> BaseGraph:
-    p = ZXParser()
-    with open(bzx, 'r') as f:
+    with open(zx, 'r') as f:
         vertices = p.parse(f.read())
     
     g = Graph(backend)
@@ -254,10 +180,12 @@ def bzx_to_graph(bzx: str, backend:Optional[str]=None) -> BaseGraph:
     g.remove_vertices(remove)
     return g
 
-def graph_to_bzx(g: BaseGraph[VT,ET]) -> str:
-    bzx = ""
+def graph_to_zx(g: BaseGraph[VT,ET]) -> str:
+    zx = ""
     edge_dict={1:"S", 2:"H"}
     vertex_dict={0:"B", 1:"Z", 2:"X", 3:"H"}
+
+    zx += "// Inputs \n"
     for i in g.inputs():
         s = ""
         s += "I"+str(i)+" ("+str(g.qubit(i))+","+str(g.row(i))+") "
@@ -266,8 +194,9 @@ def graph_to_bzx(g: BaseGraph[VT,ET]) -> str:
                 s += edge_dict[g.edge_type((i,n))]+str(n)+" "
             else:
                 s += edge_dict[g.edge_type((n,i))]+str(n)+" "
-        bzx += s+"\n"
+        zx += s+"\n"
 
+    zx += "// Outputs \n"
     for o in g.outputs():
         s = ""
         s += "O"+str(o)+" ("+str(g.qubit(o))+","+str(g.row(o))+") "
@@ -276,8 +205,9 @@ def graph_to_bzx(g: BaseGraph[VT,ET]) -> str:
                 s += edge_dict[g.edge_type((o,n))]+str(n)+" "
             else:
                 s += edge_dict[g.edge_type((n,o))]+str(n)+" "
-        bzx += s+"\n"
+        zx += s+"\n"
 
+    zx += "// Non-boundary \n"
     for v in g.vertices():
         if v not in g.inputs() and v not in g.outputs():
             s = ""
@@ -293,6 +223,6 @@ def graph_to_bzx(g: BaseGraph[VT,ET]) -> str:
                     s += frac[0]+"*pi/"+frac[1]
                 else:
                     s += frac[0]+"*pi"
-            bzx += s+"\n"
+            zx += s+"\n"
     
-    return bzx
+    return zx
