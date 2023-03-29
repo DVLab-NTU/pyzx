@@ -1,0 +1,11 @@
+// Input 
+I0 (0,0) S5
+I2 (1,0) S4
+// Output 
+O1 (0,2) S5
+O3 (1,2) S4
+// Non-boundary 
+Z4 (1,1) H6 pi/4
+Z5 (0,1) H6 pi/4
+Z6 (-1,2) H7
+Z7 (-2,2) 7*pi/4

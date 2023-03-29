@@ -78,7 +78,9 @@ class ZXParser(object):
         id, qc, neighbors, phase = self.parse_ID(info[0]), None, None, 0
         
         if id == -1: return "IO_error"
-        if not info[len(info)-1].startswith("s") and not info[len(info)-1].startswith("h"):
+        if len(info) == 2: phase = 0
+        
+        if not info[len(info)-1].startswith("s") and not info[len(info)-1].startswith("h") and len(info) > 2:
             phase = self.parse_phase(info.pop())
             if phase == "Phase_error": return "Phase_error"
         
