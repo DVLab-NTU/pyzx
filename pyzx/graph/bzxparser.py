@@ -6,6 +6,7 @@ from pyzx.graph import Graph
 from pyzx.graph.base import BaseGraph, VT, ET
 from fractions import Fraction
 from typing import List, Dict, Any, Optional, Union
+from pyzx.hsimplify import hadamard_simp
 import numpy as np
 
 class ZXParser(object):
@@ -75,10 +76,9 @@ class ZXParser(object):
         self.vertices.append(vertex)
     
     def parse_V(self, type: str, info: List[str]) -> Union[str,None]:
-        id, qc, neighbors, phase = self.parse_ID(info[0]), None, None, 0
-        
+        id, qc, neighbors, phase = self.parse_ID(info[0]), None, None, 0 if type != 'h' else Fraction(1, 1)
         if id == -1: return "IO_error"
-        if len(info) == 2: phase = 0
+        # if len(info) == 2: phase = 0 if type != 'h' else Fraction(1, 1) # NOTE - removed: redundant assignment
         
         if not info[len(info)-1].startswith("s") and not info[len(info)-1].startswith("h") and len(info) > 2:
             phase = self.parse_phase(info.pop())
@@ -170,23 +170,19 @@ def zx_to_graph(zx: str, backend:Optional[str]=None) -> BaseGraph:
     
     g.set_inputs(tuple(inputList))
     g.set_outputs(tuple(outputList))
-
-    # Change H-box into Hadamard-edge
-    remove = []
-    for v in g.vertices():
-        if g.type(v) == VertexType.H_BOX:
-            if len(g.neighbors(v)) == 2:
-                g.add_edge((list(g.neighbors(v))[0],list(g.neighbors(v))[1]), EdgeType.HADAMARD)
-                remove.append(v)
     
-    g.remove_vertices(remove)
+    # Change H-box into Hadamard-edge
+    # NOTE - the old removal method is not complete and may lead to error when multiple Hs occurs consecutively.
+    #        I've replaced it with PyZX's native H-box remover
+    removed = hadamard_simp(g, None, True)
+
     return g
 
 def graph_to_zx(g: BaseGraph[VT,ET]) -> str:
     zx = ""
     edge_dict={1:"S", 2:"H"}
     vertex_dict={0:"B", 1:"Z", 2:"X", 3:"H"}
-
+    
     zx += "// Inputs \n"
     for i in g.inputs():
         s = ""
