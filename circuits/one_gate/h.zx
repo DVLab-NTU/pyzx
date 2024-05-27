@@ -1,0 +1,9 @@
+// Input 
+I0 (0,0) S2
+// Output 
+O1 (0,4) S4
+// Non-boundary 
+Z2 (0,1) S5 pi/2
+Z3 (-1,2) S5 3*pi/2
+Z4 (0,3) S5 pi/2
+X5 (0,2)

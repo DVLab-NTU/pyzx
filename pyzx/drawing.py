@@ -293,7 +293,8 @@ def draw_d3(
     scale:Optional[FloatInt]=None, 
     auto_hbox:Optional[bool]=None,
     show_scalar:bool=False,
-    vdata: List[str]=[]
+    vdata: List[str]=[],
+    darkmode: bool=False
     ) -> Any:
 
     if get_mode() not in ("notebook", "browser"): 
@@ -352,8 +353,9 @@ def draw_d3(
         s,t = (str(link['source']), str(link['target']))
         link['num_parallel'] = counts[(s,t)]
     graphj = json.dumps({'nodes': nodes, 'links': links})
-
-    with open(os.path.join(settings.javascript_location, 'zx_viewer.inline.js'), 'r') as f:
+    
+    jsLocation = 'zx_viewer.inline.darkmode.js' if darkmode else 'zx_viewer.inline.js'
+    with open(os.path.join(settings.javascript_location, jsLocation), 'r') as f:
         library_code = f.read() + '\n'
 
     text = """<div style="overflow:auto; background-color: white" id="graph-output-{id}"></div>
@@ -371,7 +373,8 @@ showGraph('#graph-output-{id}',
                     hbox = 'true' if auto_hbox else 'false',
                     labels='true' if labels else 'false',
                     scalar_str=g.scalar.to_unicode() if show_scalar else '')
-    if get_mode() == "notebook":
+    
+    if settings.mode == "notebook":
         display(HTML(text))
     else:
         d = html.DIV(style={"overflow": "auto", "background-color": "white"}, id="graph-output-{}".format(graph_id))

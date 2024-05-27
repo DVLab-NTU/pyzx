@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 import abc
 import math
 import copy
@@ -485,6 +486,17 @@ class BaseGraph(Generic[VT, ET], metaclass=DocstringMeta):
         """Returns a Tikz representation of the graph."""
         from ..tikz import to_tikz
         return to_tikz(self,draw_scalar)
+
+    def to_zx(self) -> str:
+        from .bzxparser import graph_to_zx
+        return graph_to_zx(self)
+
+
+    @classmethod
+    def from_zx(cls, zx) -> 'BaseGraph':
+        from .bzxparser import zx_to_graph
+        return zx_to_graph(zx, cls.backend)
+
 
     @classmethod
     def from_json(cls, js) -> 'BaseGraph':
@@ -980,3 +992,13 @@ class BaseGraph(Generic[VT, ET], metaclass=DocstringMeta):
                 if self.vertex_degree(v) < 2:
                     return False
         return True
+
+def determine_file_type(zxfile: str) -> str:
+    """Tries to figure out in which format the file is given (quipper, qasm or qc)"""
+    fname = zxfile
+    ext = os.path.splitext(fname)[-1]
+    if ext == '.zx':
+        return "zx"
+
+    raise TypeError("Couldn't determine zx format.")
+
