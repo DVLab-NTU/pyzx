@@ -61,13 +61,12 @@ class ZXParser(object):
 
     def parse_IO(self, type: str, info: List[str]) -> Union[str,None]:
         id, qc, neighbors = self.parse_ID(info[0]), None, None
-
         if id == -1: return "ID_error"
-        if info[1].startswith("(") and info[1].endswith(")"):
-            qc = self.parse_coordinate(info[1])
+        if info[1].startswith("(") and info[2].endswith(")"):
+            qc = self.parse_coordinate(info[1]+info[2])
             if qc == "QC_error": return "QC_error"
             # qubit: qc[0], column: qc[1]
-            neighbors = self.parse_neighbors(info[2:])
+            neighbors = self.parse_neighbors(info[3:])
         else:
             neighbors = self.parse_neighbors(info[1:])
         if neighbors == "Nbrs_error": return neighbors
@@ -79,16 +78,15 @@ class ZXParser(object):
         id, qc, neighbors, phase = self.parse_ID(info[0]), None, None, 0 if type != 'h' else Fraction(1, 1)
         if id == -1: return "IO_error"
         # if len(info) == 2: phase = 0 if type != 'h' else Fraction(1, 1) # NOTE - removed: redundant assignment
-        
-        if not info[len(info)-1].startswith("s") and not info[len(info)-1].startswith("h") and len(info) > 2:
+        if not info[len(info)-1].startswith("s") and not info[len(info)-1].startswith("h") and len(info) > 3:
             phase = self.parse_phase(info.pop())
             if phase == "Phase_error": return "Phase_error"
         
-        if info[1].startswith("(") and info[1].endswith(")"):
-            qc = self.parse_coordinate(info[1])
+        if info[1].startswith("(") and info[2].endswith(")"):
+            qc = self.parse_coordinate(info[1]+info[2])
             if qc == "QC_error": return "QC_error"
             # qubit: qc[0], column: qc[1]
-            neighbors = self.parse_neighbors(info[2:])
+            neighbors = self.parse_neighbors(info[3:])
         else:
             neighbors = self.parse_neighbors(info[1:])
         if neighbors == "Nbrs_error": return "Nbrs_error"
